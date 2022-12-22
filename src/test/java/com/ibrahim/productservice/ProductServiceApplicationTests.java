@@ -3,6 +3,8 @@ package com.ibrahim.productservice;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibrahim.productservice.dto.ProductRequestDTO;
+import com.ibrahim.productservice.repository.ProductRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -30,6 +32,8 @@ class ProductServiceApplicationTests {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+    @Autowired
+    ProductRepository productRepository;
 
     @DynamicPropertySource
     static void setProperties(DynamicPropertyRegistry dynamicPropertyRegistry) {
@@ -41,9 +45,10 @@ class ProductServiceApplicationTests {
         ProductRequestDTO requestDTO = getProductRequest();
         String productRequestString = objectMapper.writeValueAsString(requestDTO);
         mockMvc.perform(MockMvcRequestBuilders.post("/api/product/addProduct")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(productRequestString))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(productRequestString))
                 .andExpect(status().isCreated());
+        Assertions.assertEquals(1, productRepository.findAll().size());
     }
 
 
